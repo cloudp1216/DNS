@@ -51,7 +51,7 @@ CMD ["/usr/local/bin/entrypoint.sh"]
 
 ```
 
-#### 2.制作bind镜像
+#### 2. 制作bind镜像
 
 ```shell
 [root@docker bind]# docker-compose build
@@ -68,34 +68,34 @@ bind                20190725            3ec4c7f28439        7 days ago          
 
 
 ## 三、初始化bind数据库
-#### 1.安装mariadb
+#### 1. 安装mariadb
 ```shell
 [root@dockert bind]# yum install -y mariadb-server
 ```
 
-#### 2.创建bind数据库
+#### 2. 创建bind数据库
 ```sql
 MariaDB [(none)]> CREATE DATABASE bind DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
 
-#### 3.创建bind用户并授予查询权限
+#### 3. 创建bind用户并授予查询权限
 ```sql
 MariaDB [(none)]> CREATE USER 'bind'@'%' IDENTIFIED BY 'xxxx';
 MariaDB [(none)]> GRANT SELECT ON bind.* TO 'bind'@'%';
 ```
 
-#### 4.导入bind库
+#### 4. 导入bind库
 ```sql
 MariaDB [(none)]> use bind
 MariaDB [bind]> source bind.sql
 ```
 
-#### 5.开启mariadb远程连接权限（根据具体情况选择）
+#### 5. 开启mariadb远程连接权限（根据具体情况选择）
 ```sql
 MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'xxxx';
 ```
 
-#### 6.bind.records表结构及默认zone的sql语句如下
+#### 6. bind.records表结构及默认zone的sql语句如下
 ```sql
 -- 创建表结构
 CREATE TABLE IF NOT EXISTS `records` (
@@ -139,7 +139,7 @@ INSERT INTO `records` (`zone`, `ttl`, `type`, `host`, `data`) VALUES
 
 
 ## 四、启动bind服务
-#### 1.docker-compose文件如下：
+#### 1. docker-compose文件如下：
 ```yaml
 version: "3"
 services:
@@ -160,7 +160,7 @@ services:
           - 53:53/udp                           # 对外开放端口
 ```
 
-#### 2.启动bind容器：
+#### 2. 启动bind容器：
 ```shell
 [root@docker bind]# docker-compose up -d
 Creating network "bind_default" with the default driver
@@ -169,10 +169,8 @@ Creating bind_bind_1 ... done
 
 
 ## 五、添加DNS解析记录
-在mariadb开启远程连接的情况下，使用"Navicat for MySQL"连接数据库添加记录。
-
-
-## 六、使用dig命令解析
+#### 1. 使用"Navicat for MySQL"连接数据库添加记录
+#### 2. 使用dig命令能够正常解析
 ```shell
 [root@localhost bind]# dig @10.0.0.230 mirror.speech.local
 
@@ -205,7 +203,7 @@ speech.local.       86400   IN  NS  ns1.speech.local.
 ```
 
 
-## 七、数据库调优
+## 六、数据库调优
 ```shell
 [root@docker ~]# vi /etc/my.cnf
 
@@ -221,8 +219,8 @@ innodb_write_io_threads=8
 ```
 
 
-## 八、使用DNS多实例
-#### 1.修改docker-compose.yml文件增加容器个数
+## 七、使用DNS多实例
+#### 1. 修改docker-compose.yml文件增加容器个数
 ```yaml
 version: "3"
 services:
@@ -284,7 +282,7 @@ bind_bind_12053_1   /usr/bin/tini -- /usr/loca ...   Up      0.0.0.0:12053->53/u
 bind_bind_13053_1   /usr/bin/tini -- /usr/loca ...   Up      0.0.0.0:13053->53/udp
 ```
 
-#### 2.编译安装nginx
+#### 2. 编译安装nginx
 ```shell
 [root@docker ~]# tar zxf nginx-1.16.0.tar.gz
 [root@docker ~]# cd nginx-1.16.0
@@ -293,7 +291,7 @@ bind_bind_13053_1   /usr/bin/tini -- /usr/loca ...   Up      0.0.0.0:13053->53/u
 [root@docker nginx-1.16.0]# make install
 ```
 
-#### 3.修改nginx配置文件
+#### 3. 修改nginx配置文件
 ```shell
 [root@docker ~]# vi /usr/local/nginx/conf/nginx.conf
 
@@ -324,9 +322,8 @@ stream {
 }
 ```
 
-#### 4.启动nginx代理
+#### 4. 启动nginx代理
 ```shell
 [root@docker ~]# /usr/local/nginx/sbin/nginx
 ```
-
 
