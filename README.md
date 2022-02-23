@@ -52,7 +52,6 @@ CMD ["/usr/local/bin/entrypoint.sh"]
 ```
 
 #### 2. 制作bind镜像
-
 ```shell
 [root@docker bind]# docker-compose build
 Building bind
@@ -328,4 +327,5 @@ stream {
 ```shell
 [root@docker ~]# /usr/local/nginx/sbin/nginx
 ```
+
 
