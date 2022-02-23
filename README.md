@@ -57,8 +57,10 @@ CMD ["/usr/local/bin/entrypoint.sh"]
 [root@docker bind]# docker-compose build
 Building bind
 Step 1/8 : FROM centos:7.6.1810
- ---> 
+ ---> f1cb7c7d58b7
 Step 2/8 : ADD bind-9.11.9.tar.gz /tmp
+ ---> Using cache
+ ---> 4063fc4beed1
 .....
 
 [root@docker bind]# docker images bind
