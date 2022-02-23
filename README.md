@@ -5,7 +5,7 @@
 
 
 ## 二、制作bind镜像
-#### 1.Dockerfile
+#### 1. Dockerfile
 ```shell
 FROM centos:7.6.1810
 
