@@ -169,7 +169,7 @@ Creating bind_bind_1 ... done
 
 
 ## 五、添加DNS解析记录
-在mariadb开启远程连接的情况下，使用"Navicat for MySQL"连接数据库添加A记录即可（或者使用INSERT语句添加）。
+在mariadb开启远程连接的情况下，使用"Navicat for MySQL"连接数据库添加记录。
 
 
 ## 六、使用dig命令解析
