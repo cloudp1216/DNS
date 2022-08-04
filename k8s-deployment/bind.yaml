@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dns
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bind
+  namespace: dns
+data:
+  named.conf: |
+    key "rndc-key" {
+        algorithm hmac-md5;
+        secret "F0g1SBRjuLvUJE/rS5OigQ==";
+    };
+    controls {
+        inet 127.0.0.1 port 953
+        allow { 127.0.0.1; } keys { "rndc-key"; };
+    };
+    options {
+        listen-on port 53 { any; };
+        directory "/usr/local/bind/var";
+        pid-file "named.pid";
+        allow-query { any; };
+        recursion yes;
+        forwarders { 223.5.5.5; 223.6.6.6; };
+    };
+    dlz "mysql" {
+        database "dlopen ../lib/dlz_mysql_dynamic.so
+        { host=xxxx port=3306 dbname=bind user=bind pass=xxxx threads=2 }
+        { SELECT zone 
+            FROM records 
+            WHERE zone = '$zone$' }
+        { SELECT ttl, type, mx_priority, IF(type = 'TXT', CONCAT('\"',data,'\"'), data) AS data 
+            FROM records 
+            WHERE zone = '$zone$' AND host = '$record$' AND type <> 'SOA' AND type <> 'NS' }
+        { SELECT ttl, type, data, primary_ns, resp_contact, serial, refresh, retry, expire, minimum 
+            FROM records 
+            WHERE zone = '$zone$' AND (type = 'SOA' OR type='NS') }
+        { SELECT ttl, type, host, mx_priority, IF(type = 'TXT', CONCAT('\"',data,'\"'), data) AS data, resp_contact, serial, refresh, retry, expire, minimum 
+            FROM records 
+            WHERE zone = '$zone$' AND type <> 'SOA' AND type <> 'NS' }";
+    };
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bind
+  namespace: dns
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: bind
+      version: v9.11.36
+  template:
+    metadata:
+      labels:
+        app: bind
+        version: v9.11.36
+    spec:
+      containers:
+      - name: bind
+        image: cloudp1216/bind:9.11.36
+        volumeMounts:
+        - name: dns
+          mountPath: /usr/local/bind/etc/named.conf
+          subPath: named.conf
+      volumes:
+      - name: dns
+        configMap:
+          name: bind
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: bind
+  namespace: dns
+spec:
+  selector:
+    app: bind
+    version: v9.11.36
+  type: NodePort
+  ports:
+  - name: dns
+    port: 53
+    targetPort: 53
+    nodePort: 30053
+    protocol: UDP
